@@ -1,0 +1,27 @@
+# Full stack trace of the failure (first occurrence)
+# captured: 2026-10-25 19:02:50 (device garnet, 23.2-20261011-microG-garnet)
+# The same block repeats 40 times in this capture (the app retries on every refresh).
+
+10-25 19:02:50.852 W/ContextImpl( 9161): Failed to ensure /storage/emulated/0/Android/data/org.scrib.transcriber/files
+10-25 19:02:50.852 W/ContextImpl( 9161): java.lang.IllegalStateException: Failed to prepare /storage/emulated/0/Android/data/org.scrib.transcriber/files
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.Parcel.createExceptionOrNull(Parcel.java:3381)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.Parcel.createException(Parcel.java:3357)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.Parcel.readException(Parcel.java:3340)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.Parcel.readException(Parcel.java:3282)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.storage.IStorageManager$Stub$Proxy.mkdirs(IStorageManager.java:1305)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.storage.StorageManager.mkdirs(StorageManager.java:1421)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.app.ContextImpl.ensureExternalDirsExistOrFilter(ContextImpl.java:3931)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.app.ContextImpl.getExternalFilesDirs(ContextImpl.java:935)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.app.ContextImpl.getExternalFilesDir(ContextImpl.java:924)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.content.ContextWrapper.getExternalFilesDir(ContextWrapper.java:308)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at org.scrib.transcriber.ModelManager.modelsDir(ModelManager.kt:31)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at org.scrib.transcriber.ModelManager.installedFileNames(ModelManager.kt:61)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at org.scrib.transcriber.ScribViewModel.build(ScribViewModel.kt:116)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at org.scrib.transcriber.ScribViewModel.<init>(ScribViewModel.kt:109)
+	... (framework/Compose frames omitted) ...
+10-25 19:02:50.852 W/ContextImpl( 9161): Caused by: android.os.RemoteException: Remote stack trace:
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at com.android.server.StorageManagerService.mkdirs(StorageManagerService.java:3764)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.storage.IStorageManager$Stub.onTransact(IStorageManager.java:648)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.Binder.execTransactInternal(Binder.java:1473)
+10-25 19:02:50.852 W/ContextImpl( 9161): 	at android.os.Binder.execTransact(Binder.java:1418)
+10-25 19:02:50.852 W/ContextImpl( 9161): 
