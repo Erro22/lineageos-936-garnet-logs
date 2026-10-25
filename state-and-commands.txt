@@ -1,0 +1,50 @@
+# State of the device (2026-10-25, after a normal reboot)
+
+## Build
+ro.lineage.version=23.2-20261011-microG-garnet
+ro.build.date=Sun Oct 11 04:11:35 UTC 2026
+kernel=5.10.269-gki-g5a95bbe47a3d
+baseband=MPSS.DE.3.1.1-GLB-2434eaa691,MPSS.DE.3.1.1-GLB-2434eaa691
+fingerprint=Redmi/garnet_global/garnet:16/BP2A.250605.031.A3/OS3.0.5.0.WNRMIXM:user/release-keys
+verifiedbootstate=green flash.locked=1
+
+## sys.user.0.ce_available
+now: [true]
+
+## /data/adb/ce_fix.log
+(the workaround script logs the property value it sees at boot, then sets it)
+2026-10-25 19:13:53 start: ce_available='true'
+2026-10-25 19:13:53 end: ce_available='true'
+2026-10-25 19:16:39 start: ce_available=''
+2026-10-25 19:16:39 end: ce_available='true'
+
+## /data/media/0/Android/data after the workaround ran at that boot
+total 24
+drwxrws--x 8 media_rw ext_data_rw 3452 2026-10-25 19:17 .
+drwxrws--x 5 media_rw media_rw    3452 2026-10-20 18:27 ..
+-rw-rw---- 1 u0_a133  ext_data_rw    0 2026-10-20 18:27 .nomedia
+drwxrws--- 4 u0_a160  ext_data_rw 3452 2026-10-25 19:17 com.google.android.youtube
+drwxrws--- 3 u0_a88   ext_data_rw 3452 2026-10-25 19:17 org.fdroid.fdroid
+drwxrws--- 3 u0_a269  ext_data_rw 3452 2026-10-25 19:07 org.scrib.transcriber
+drwxrws--- 4 u0_a159  ext_data_rw 3452 2026-10-25 19:17 org.telegram.messenger
+drwxrws--- 3 u0_a165  ext_data_rw 3452 2026-10-25 19:15 ru.aliexpress.buyer
+drwxrws--- 3 u0_a158  ext_data_rw 3452 2026-10-25 19:17 ru.oneme.app
+
+## ownership of the directories the system created
+u0_a160 ext_data_rw 2770 2026-10-25 19:17:30.040999984 +0300 /data/media/0/Android/data/com.google.android.youtube/
+u0_a88 ext_data_rw 2770 2026-10-25 19:17:30.000999984 +0300 /data/media/0/Android/data/org.fdroid.fdroid/
+u0_a269 ext_data_rw 2770 2026-10-25 19:07:00.286541567 +0300 /data/media/0/Android/data/org.scrib.transcriber/
+u0_a159 ext_data_rw 2770 2026-10-25 19:17:28.880999984 +0300 /data/media/0/Android/data/org.telegram.messenger/
+u0_a165 ext_data_rw 2770 2026-10-25 19:15:57.074541362 +0300 /data/media/0/Android/data/ru.aliexpress.buyer/
+u0_a158 ext_data_rw 2770 2026-10-25 19:17:29.016999984 +0300 /data/media/0/Android/data/ru.oneme.app/
+
+## dropbox: boots / system_server restarts
+2026-10-22 21:14:38 SYSTEM_BOOT (text, 666 bytes)
+2026-10-23 08:31:06 SYSTEM_BOOT (text, 666 bytes)
+2026-10-23 18:17:31 SYSTEM_RESTART (text, 666 bytes)
+2026-10-23 18:56:23 SYSTEM_RESTART (text, 666 bytes)
+2026-10-25 19:17:26 SYSTEM_BOOT (text, 666 bytes)
+
+## volumes
+private mounted null
+emulated;0 mounted null
