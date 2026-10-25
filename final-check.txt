@@ -1,0 +1,48 @@
+Final check - LineageOS issue #936 (garnet)
+
+Device: Redmi garnet (23122PCD1G)
+ROM: 23.2-20261011-microG-garnet (Android 16, security patch 2026-10-01)
+Kernel: 5.10.269-gki-g5a95bbe47a3d
+
+1) One-time fix applied:
+   chcon u:object_r:checkin_data_file:s0:c512,c768 /data/misc_ce/0/checkin
+
+2) After fix, normal boot + unlock:
+   10-25 23:37:34.464 D/UserDataPreparer: Setting property: sys.user.0.ce_available=true
+   vold_prepare_subdirs failed: 0
+   Failed to prepare user: 0
+
+3) Reproduce attempt: deleted /data/misc_ce/0/checkin, removed screen lock (CE auto-unlocked at boot),
+   rebooted. Watcher (post-fs-data) log:
+   post-fs-data uptime=9.05  ce_available=  exists_now=no
+   EXISTS        uptime=22.35 ce_available=true label=drwxrwx--- system cache checkin_data_file:s0:c512,c768
+   AFTER1S       uptime=23.45 label=...s0:c512,c768
+   vold_failed=0
+   => vold recreated the directory with the correct user level; the bug did NOT reproduce.
+
+4) Current state (2026-10-25 23:47:31 MSK):
+   sys.user.0.ce_available = true
+   /data/misc_ce/0/checkin = u:object_r:checkin_data_file:s0:c512,c768
+   10-25 23:43:46.096 D/UserDataPreparer: Setting property: sys.user.0.ce_available=true
+   vold_prepare_subdirs failed = 0
+   Failed to prepare user = 0
+   avc denied for vold_prepare_subdirs = 0
+   Android/data entries: com.aurora.store, com.google.android.youtube, org.fdroid.fdroid,
+   org.scrib.transcriber, org.telegram.messenger, ru.aliexpress.buyer, ru.oneme.app
+
+Original failure (2026-10-25 19:02:50):
+   W/ContextImpl: Failed to ensure /storage/emulated/0/Android/data/org.scrib.transcriber/files
+   W/ContextImpl: java.lang.IllegalStateException: Failed to prepare .../files
+   Caused by: RemoteException ... at com.android.server.StorageManagerService.mkdirs(StorageManagerService.java:3764)
+   (the second throw = sys.user.<user>.ce_available check; CE was already unlocked)
+
+Original avc denial (boot at 23:15):
+   avc: denied { relabelfrom } for comm="vold_prepare_su" name="checkin"
+     scontext=u:r:vold_prepare_subdirs:s0 tcontext=u:object_r:checkin_data_file:s0 tclass=dir permissive=0
+   E/vold: Process exited with code: 255
+   E/vold: vold_prepare_subdirs failed
+   E/StorageManagerService: android.os.ServiceSpecificException (code 0)
+     at StorageManagerService.prepareUserStorageInternal(...:3396)
+     at UserDataPreparer.prepareUserDataLI(...:102)
+     at UserManagerService.onBeforeUnlockUser(...:7968)
+     at UserController.finishUserUnlocking(...:905)
