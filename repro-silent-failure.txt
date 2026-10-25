@@ -1,0 +1,61 @@
+Reproduction of the failure mode (controlled, no factory reset)
+
+Device: garnet, 23.2-20261011-microG-garnet
+Date: 2026-10-25 23:58 - 2026-10-26 00:01
+
+Step 1 - put the label back into the broken state:
+  mkdir -p /data/misc_ce/0/checkin
+  chown system:cache /data/misc_ce/0/checkin
+  chmod 0770 /data/misc_ce/0/checkin
+  chcon u:object_r:checkin_data_file:s0 /data/misc_ce/0/checkin
+  -> drwxrwx--- system cache u:object_r:checkin_data_file:s0 /data/misc_ce/0/checkin
+
+Step 2 - reboot.
+
+Step 3 - result after boot/unlock:
+  sys.user.0.ce_available = (empty)
+
+  dmesg:
+  [22.259192] type=1400 audit(...): avc: denied { relabelfrom } for comm="vold_prepare_su"
+    name="checkin" dev="dm-42" ino=73818 scontext=u:r:vold_prepare_subdirs:s0
+    tcontext=u:object_r:checkin_data_file:s0 tclass=dir permissive=0
+
+  logcat:
+  23:59:20.068 E/PackageManager: Failed to prepare user 0 on volume null:
+      java.lang.RuntimeException: android.os.ServiceSpecificException:  (code 0)
+  23:59:20.276 E/vold: vold_prepare_subdirs failed
+  23:59:20.277 E/PackageManager: Failed to prepare user 0 on volume null: ...
+
+  /data/system/uiderrors.txt (persistent, root only):
+  25.10.2026 23:59: Failed to prepare user 0 on volume null: java.lang.RuntimeException: ...
+  25.10.2026 23:59: Failed to prepare user 0 on volume null: ...
+
+  App with missing Android/data/<pkg> (Scrib, package dir temporarily renamed):
+  40 x W/ContextImpl: Failed to ensure /storage/emulated/0/Android/data/org.scrib.transcriber/files
+        W/ContextImpl: java.lang.IllegalStateException: Failed to prepare .../files
+        at android.os.storage.IStorageManager$Stub$Proxy.mkdirs(IStorageManager.java:1305)
+        at android.os.storage.StorageManager.mkdirs(StorageManager.java:1421)
+        at android.app.ContextImpl.ensureExternalDirsExistOrFilter(ContextImpl.java:3931)
+        ...
+  The directory was not created. getExternalFilesDir() returned null.
+  The app UI showed no error at all - it simply displayed "no model installed"
+  although the model file was still on disk (invisible to the app).
+
+Step 4 - fix and reboot:
+  chcon u:object_r:checkin_data_file:s0:c512,c768 /data/misc_ce/0/checkin
+  reboot
+
+  Result:
+  00:01:19.546 D/UserDataPreparer: Setting property: sys.user.0.ce_available=true
+  vold_prepare_subdirs failed: 0
+  Failed to ensure: 0
+  app sees its stored model again.
+
+Conclusion: the failure mode and the silent behaviour are fully reproducible.
+Only the origin of the wrong label on the very first boot after flashing is not reproducible.
+
+Where the error is swallowed:
+- ContextImpl.ensureExternalDirsExistOrFilter() catches Exception, logs at W, sets dir = null.
+- UserDataPreparer.prepareUserDataLI() catch: logs to uiderrors.txt, retries once, then continues boot
+  (recovery wipe only for a *new* user 0 with volumeUuid == null).
+- Nothing is surfaced to the user or to the app.
